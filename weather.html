@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather App</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #f0f0f0;
+            padding: 20px;
+        }
+        #weather {
+            margin-top: 20px;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+<body>
+    <h1>Mr.程's Weather App</h1>
+    <select id="city-select" onchange="setCityCode()">
+        <option value="">常用</option>
+        <option value="310000">Shanghai (310000)</option>
+        <option value="310120">Fengxian (310120)</option>
+        <option value="330500">湖州 (330500)</option>
+        <option value="310107">Putuo (310107)</option>
+        <option value="330000">Zhejiang (330000)</option>
+    </select>
+    <p>Enter a city code to get the current weather:</p>
+    <input type="text" id="city" placeholder="Enter city code (e.g., 110101)">
+    <button onclick="getWeather()">Get Weather</button>
+
+    <div id="weather"></div>
+
+    <script>
+        async function getWeather() {
+            const city = document.getElementById('city').value;
+            const apiKey = '5c112e473df44843e6e13a43c582e535'; // 替换为你的高德天气 API 密钥
+            const url = `https://restapi.amap.com/v3/weather/weatherInfo?key=${apiKey}&city=${city}`;
+
+            try {
+                const response = await fetch(url);
+                if (!response.ok) {
+                    throw new Error('City not found');
+                }
+                const data = await response.json();
+                displayWeather(data);
+            } catch (error) {
+                document.getElementById('weather').innerHTML = `<p style="color: red;">${error.message}</p>`;
+            }
+        }
+
+        function displayWeather(data) {
+            if (data.status === '1' && data.lives && data.lives.length > 0) {
+                const weatherData = data.lives[0];
+                const { city, temperature, weather, winddirection, windpower } = weatherData;
+                document.getElementById('weather').innerHTML = `
+                    <h2>Weather in ${city}</h2>
+                    <p>Temperature: ${temperature}&deg;C</p>
+                    <p>Weather: ${weather}</p>
+                    <p>Wind Direction: ${winddirection}</p>
+                    <p>Wind Power: ${windpower}</p>
+                `;
+            } else {
+                document.getElementById('weather').innerHTML = `<p style="color: red;">City not found</p>`;
+            }
+        }
+    </script>
+</body>
+</html>
